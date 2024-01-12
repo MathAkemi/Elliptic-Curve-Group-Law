@@ -3,10 +3,29 @@ import numpy as np
 from sympy import var, plot_implicit
 
 
-##########################
-### DEFINING THE CURVE ###
-##########################
+################################
+### ELLIPTIC CURVE GROUP LAW ###
+################################
 
+#######################################################################################################
+# This program is a full implementation of the group law on elliptic curves with plotting. The goal   #
+# of writing it is to deepen my understanding of elliptic curves and to improve my ability to work    #
+# with them to prepare for further work with elliptic curve cryptography. I intend forthis code to be #
+# useful to me as I write implementations for more advanced algorithms.				      #
+#######################################################################################################
+
+
+
+#############################################################################################
+# The Point class holds a point on the curve.                                               #
+#											    #
+# Point.x: the x-coordinate of the point						    #
+# Point.y: the y-coordinate of the point						    #
+# Point.curve: the EllipticCurve object corresponding to the curve on which the point lies. #
+#											    #
+# Point addition, negation, subtraction, and mult. as a groupf action of the integers are   #
+# all fully supported with the respective magic methods.                                    #
+############################################################################################
 class Point():
     
     def __init__(self, x, y, E=None):
@@ -41,6 +60,24 @@ class Point():
 
     __repr__ = __str__
 
+
+
+##################################################################################################
+# The EllipticCurve class represents the elliptic curve to be studied.                           #
+#												 #
+# EllipticCurve.a: the coefficient of the x^3 term in the Weierstrass equation                   #
+# EllipticCurve.b: the coefficient of the x term in the Weierstrass equation                     #
+# EllipticCurve.dis: the discriminant of the curve, must be != 0                                 #
+#												 #
+# isOnCurve (P): returns 1 if P is a point on the curve, 0 otherwise                             #
+# addPoints(P, Q): returns P + Q according to the group law on the curve                         #
+# timesTwo(P): returns 2*P = P + P								 #
+# mulPoint(n, P): adds P to itself n-1 times and returns the result using an efficient algorithm #
+# plotCurve(): plots the elliptic curve on the real plane                                        #
+# addAndPlot(P, Q): computes P + Q and plots the process of finding the value			 #
+#												 #
+# Comparison with "==" is supported. Calling the object returns the Weierstrass equation.        #
+##################################################################################################
 class EllipticCurve():
 
     def __init__(self, a, b):
