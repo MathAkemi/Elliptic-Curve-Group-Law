@@ -1,1 +1,1 @@
-# Elliptic-Curve-Group-Law
+# elliptic-curve-group-law
