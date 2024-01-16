@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from sympy import var, plot_implicit
+from sympy import var, plot_implicit, lambdify
 
 
 ################################
@@ -64,18 +64,18 @@ class Point():
 
 ##################################################################################################
 # The EllipticCurve class represents the elliptic curve to be studied.                           #
-#												 #
+#												                                                 #
 # EllipticCurve.a: the coefficient of the x^3 term in the Weierstrass equation                   #
 # EllipticCurve.b: the coefficient of the x term in the Weierstrass equation                     #
 # EllipticCurve.dis: the discriminant of the curve, must be != 0                                 #
-#												 #
+#												                                                 #
 # isOnCurve (P): returns 1 if P is a point on the curve, 0 otherwise                             #
 # addPoints(P, Q): returns P + Q according to the group law on the curve                         #
-# timesTwo(P): returns 2*P = P + P								 #
+# timesTwo(P): returns 2*P = P + P								                                 #
 # mulPoint(n, P): adds P to itself n-1 times and returns the result using an efficient algorithm #
 # plotCurve(): plots the elliptic curve on the real plane                                        #
-# addAndPlot(P, Q): computes P + Q and plots the process of finding the value			 #
-#												 #
+# addAndPlot(P, Q): computes P + Q and plots the process of finding the value			         #
+#												                                                 #
 # Comparison with "==" is supported. Calling the object returns the Weierstrass equation.        #
 ##################################################################################################
 class EllipticCurve():
@@ -156,7 +156,7 @@ class EllipticCurve():
     
     def plotCurve(self):
             var('x y')
-            toPlot = x**3 + curve.a*x + curve.b - y**2 
+            toPlot = x**3 + self.a*x + self.b - y**2 
             plot_implicit(toPlot)
 
     def addAndPlot(self, P, Q):
@@ -164,12 +164,14 @@ class EllipticCurve():
 
         if not P.x == float("inf") and not P.y == float("inf") and not Q.x == float("inf") and not Q.y == float("inf") and not (P.x == Q.x):
             m = (Q.y - P.y) / (Q.x - P.x)
+            c = P.y - m*P.x
 
         if P.x == Q.x:
             if P.y != Q.y:
                 m = float("inf")
             else:
                 m = (3 * P.x * P.x + P.curve.a) / (2 * P.y)
+                c = P.y - m*P.x
 
         if P.x == float("inf") and P.y == float("inf"):
             m = float("inf")
@@ -178,10 +180,27 @@ class EllipticCurve():
             m = float("inf")
 
         var('x y')
-        toPlot = plt(x, m*x - m*P.x + P.y)
-        toPlot.append([P.x, Q.x, R.x, R.x], [P.y, Q.y, R.y, -R.y], "0")
-        toPlot.append(x = R.x)
-        plot(toPLot)
+        if m != float("inf"):
+            x_values = np.linspace(min(P.x, Q.x, R.x) - 1, max(P.x, Q.x, R.x) + 1, 10000)
+            y_values = m*x_values + c
+        elif m == float("inf"):
+            # ADDITION WITH INF NOT YET WORKING
+            x_values = np.linspace(R.x - 5, R.x + 5, 10000)
+            y_values = P.y
+
+        f_curve = lambda x : x**3 + curve.a*x + curve.b
+        curve_values_pos = np.sqrt(f_curve(x_values))
+        curve_values_neg = -np.sqrt(f_curve(x_values))    
+        plt.plot(x_values, curve_values_pos, color='orange')
+        plt.plot(x_values, curve_values_neg, color='orange')
+
+        plt.plot(x_values, y_values)
+        plt.axvline(x=R.x, linestyle='--', color='gray')
+        plt.scatter([P.x, Q.x, R.x], [P.y, Q.y, R.y], color=['red', 'green', 'blue'])
+        
+        plt.axis('equal')
+        plt.show()
+
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
