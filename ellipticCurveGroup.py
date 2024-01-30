@@ -11,21 +11,21 @@ from sympy import var, plot_implicit, lambdify
 # This program is a full implementation of the group law on elliptic curves with plotting. The goal   #
 # of writing it is to deepen my understanding of elliptic curves and to improve my ability to work    #
 # with them to prepare for further work with elliptic curve cryptography. I intend forthis code to be #
-# useful to me as I write implementations for more advanced algorithms.				      #
+# useful to me as I write implementations for more advanced algorithms.				                  #
 #######################################################################################################
 
 
 
 #############################################################################################
 # The Point class holds a point on the curve.                                               #
-#											    #
-# Point.x: the x-coordinate of the point						    #
-# Point.y: the y-coordinate of the point						    #
+#											                                                #
+# Point.x: the x-coordinate of the point						                            #
+# Point.y: the y-coordinate of the point						                            #
 # Point.curve: the EllipticCurve object corresponding to the curve on which the point lies. #
-#											    #
+#											                                                #
 # Point addition, negation, subtraction, and mult. as a groupf action of the integers are   #
 # all fully supported with the respective magic methods.                                    #
-############################################################################################
+#############################################################################################
 class Point():
     
     def __init__(self, x, y, E=None):
@@ -68,7 +68,9 @@ class Point():
 # EllipticCurve.a: the coefficient of the x^3 term in the Weierstrass equation                   #
 # EllipticCurve.b: the coefficient of the x term in the Weierstrass equation                     #
 # EllipticCurve.dis: the discriminant of the curve, must be != 0                                 #
-#												                                                 #
+# EllipticCurve.eqn: the equation to output: 'w' for Weierstrass, 'l' for Legendre               #
+# EllipticCurve.l: the value of lambda in the Legendre equation                                  #
+#                                                                                                #
 # isOnCurve (P): returns 1 if P is a point on the curve, 0 otherwise                             #
 # addPoints(P, Q): returns P + Q according to the group law on the curve                         #
 # timesTwo(P): returns 2*P = P + P								                                 #
@@ -80,9 +82,15 @@ class Point():
 ##################################################################################################
 class EllipticCurve():
 
-    def __init__(self, a, b):
-        self.a = a
+    def __init__(self, a, b, eq='w'):
+        self.a = a  # Weierstrass constants; eqn type only specifies the type to print
         self.b = b
+        if eq == 'w' or eq == 'l' or eq == 'c' or eq == 'q':
+            self.eqn = eq
+        else:
+            print("Equation type invalid. Please choose either 'w' for Weierstrass, 'l' for Legendre, 'c' for cubic, and 'q' for quartic equations. Set to Weierstrass by default.")
+            self.eqn = 'w'
+        self.l = 0
 
         self.dis = -16*(4*a*a*a+27*b*b) 
         if self.dis == 0:
@@ -173,20 +181,21 @@ class EllipticCurve():
                 m = (3 * P.x * P.x + P.curve.a) / (2 * P.y)
                 c = P.y - m*P.x
 
+        case = -1   # This is used to solve problems with addition w/ inf.
         if P.x == float("inf") and P.y == float("inf"):
+            case = 0
             m = float("inf")
 
         if Q.x == float("inf") and Q.y == float("inf"):
+            case = 1
             m = float("inf")
 
         var('x y')
         if m != float("inf"):
-            x_values = np.linspace(min(P.x, Q.x, R.x) - 1, max(P.x, Q.x, R.x) + 1, 10000)
+            x_values = np.linspace(min(P.x, R.x, Q.x) - 1, max(P.x, R.x, Q.x) + 1, 10000)
             y_values = m*x_values + c
         elif m == float("inf"):
-            # ADDITION WITH INF NOT YET WORKING
-            x_values = np.linspace(R.x - 5, R.x + 5, 10000)
-            y_values = P.y
+            x_values = np.linspace(R.x - 3, R.x + 3, 10000)
 
         f_curve = lambda x : x**3 + curve.a*x + curve.b
         curve_values_pos = np.sqrt(f_curve(x_values))
@@ -194,7 +203,10 @@ class EllipticCurve():
         plt.plot(x_values, curve_values_pos, color='orange')
         plt.plot(x_values, curve_values_neg, color='orange')
 
-        plt.plot(x_values, y_values)
+        if m != float("inf"):
+            plt.plot(x_values, y_values)
+        else:
+            plt.axvline(x=R.x)
         plt.axvline(x=R.x, linestyle='--', color='gray')
         plt.scatter([P.x, Q.x, R.x], [P.y, Q.y, R.y], color=['red', 'green', 'blue'])
         
@@ -206,14 +218,17 @@ class EllipticCurve():
         return self.a == other.a and self.b == other.b
 
     def __str__(self):
-        if self.a > 0 and self.b > 0:
-            return str("y^2 = x^3 + " + str(self.a) + "x + " + str(self.b))
-        elif self.a > 0 and self.b < 0:
-            return str("y^2 = x^3 + " + str(self.a) + "x - " + str(-self.b))
-        elif self.a < 0 and self.b > 0:
-            return str("y^2 = x^3 - " + str(-self.a) + "x + " + str(self.b))
-        elif self.a < 0 and self.b < 0:
-            return str("y^2 = x^3 - " + str(-self.a) + "x - " + str(-self.b))
+        if self.eqn == 'w':
+            if self.a > 0 and self.b > 0:
+                return str("y^2 = x^3 + " + str(self.a) + "x + " + str(self.b))
+            elif self.a > 0 and self.b < 0:
+                return str("y^2 = x^3 + " + str(self.a) + "x - " + str(-self.b))
+            elif self.a < 0 and self.b > 0:
+                return str("y^2 = x^3 - " + str(-self.a) + "x + " + str(self.b))
+            elif self.a < 0 and self.b < 0:
+                return str("y^2 = x^3 - " + str(-self.a) + "x - " + str(-self.b))
+        elif self.eqn == 'l':
+            return str("y^2 = (x - 1)(x - " + str(self.l) + ")")
 
     __repr__ = __str__
 
