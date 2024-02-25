@@ -82,6 +82,7 @@ class Point():
 ##################################################################################################
 class EllipticCurve():
 
+    # Initialize an EllipticCurve object.
     def __init__(self, a, b, eq='w'):
         self.a = a  # Weierstrass constants; eqn type only specifies the type to print
         self.b = b
@@ -96,6 +97,7 @@ class EllipticCurve():
         if self.dis == 0:
             raise Exception("This is not an elliptic curve.")
 
+    # Reutrn 1 if P is on the curve and 0 otherwise.
     def isOnCurve(self, P):
         toCheck = (P.y)**2 - (P.x)**3 - self.a*(P.x) - self.b
         if P.x == float("inf") or P.y == float("inf"):
@@ -105,6 +107,7 @@ class EllipticCurve():
         else:
             return 0
 
+    # Add the points P and Q according to the group law on the curve E.
     def addPoints(self, P, Q):
         if not isinstance(P, Point) or not isinstance(Q, Point):
             return "Please enter a Point object."
@@ -133,6 +136,7 @@ class EllipticCurve():
         R = Point(x, y, curve)
         return R
 
+    # Double a point, i.e. add it to itself.
     def timesTwo(self, P):
         m = (3 * P.x * P.x + P.curve.a) / (2 * P.y)
         
@@ -142,6 +146,7 @@ class EllipticCurve():
 
         return Q
 
+    # Multiply a point by an integer n, i.e. add it to itself n-1 times.
     def mulPoint(self, P, n):
         if P.x == float("inf") or P.y == float("inf"):
             return P
@@ -161,12 +166,22 @@ class EllipticCurve():
                 C = C
 
         return B
+
+    # Computes the order of the group.
+    def computeCurveOrder(self):
+        return 0;
+
+    # Returns the orbit of the point using the "baby step, giant step" algorithm.
+    def computePointOrder(self, P):
+        return 0;
     
+    # Plot the curve.
     def plotCurve(self):
             var('x y')
             toPlot = x**3 + self.a*x + self.b - y**2 
             plot_implicit(toPlot)
 
+    # Add P and Q and plot them on the curve.
     def addAndPlot(self, P, Q):
         R = P + Q
 
