@@ -234,8 +234,8 @@ class EllipticCurve():
         if c == 'w':
             return __str__(self)
         if c == 'l':
-            float lambda = 0;       # WIP: will print the Legendre form of the curve.
-            return lamda
+            l = 0;       # WIP: will print the Legendre form of the curve.
+            return l;
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
