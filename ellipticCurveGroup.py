@@ -166,14 +166,6 @@ class EllipticCurve():
                 C = C
 
         return B
-
-    # Computes the order of the group.
-    def computeCurveOrder(self):
-        return 0;
-
-    # Returns the orbit of the point using the "baby step, giant step" algorithm.
-    def computePointOrder(self, P):
-        return 0;
     
     # Plot the curve.
     def plotCurve(self):
