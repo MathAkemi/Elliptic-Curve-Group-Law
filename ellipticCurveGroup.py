@@ -228,22 +228,27 @@ class EllipticCurve():
         plt.axis('equal')
         plt.show()
 
+    def printEquation(self, c):
+        if not isinstance(c, char) or not (c == 'w' or c == 'l'):
+            return "Please pass either 'w' or 'l' for the Weierstrass or Legendre equations."
+        if c == 'w':
+            return __str__(self)
+        if c == 'l':
+            float lambda = 0;       # WIP: will print the Legendre form of the curve.
+            return lamda
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b
 
     def __str__(self):
-        if self.eqn == 'w':
-            if self.a > 0 and self.b > 0:
-                return str("y^2 = x^3 + " + str(self.a) + "x + " + str(self.b))
-            elif self.a > 0 and self.b < 0:
-                return str("y^2 = x^3 + " + str(self.a) + "x - " + str(-self.b))
-            elif self.a < 0 and self.b > 0:
-                return str("y^2 = x^3 - " + str(-self.a) + "x + " + str(self.b))
-            elif self.a < 0 and self.b < 0:
-                return str("y^2 = x^3 - " + str(-self.a) + "x - " + str(-self.b))
-        elif self.eqn == 'l':
-            return str("y^2 = (x - 1)(x - " + str(self.l) + ")")
+        if self.a > 0 and self.b > 0:
+            return str("y^2 = x^3 + " + str(self.a) + "x + " + str(self.b))
+        elif self.a > 0 and self.b < 0:
+            return str("y^2 = x^3 + " + str(self.a) + "x - " + str(-self.b))
+        elif self.a < 0 and self.b > 0:
+            return str("y^2 = x^3 - " + str(-self.a) + "x + " + str(self.b))
+        elif self.a < 0 and self.b < 0:
+            return str("y^2 = x^3 - " + str(-self.a) + "x - " + str(-self.b))
 
     __repr__ = __str__
 
